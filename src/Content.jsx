@@ -18,11 +18,15 @@ export function Content() {
 //response result of HTTP request
 //const HandleIndexPatients is a fx that fetches data from an API and updates the state with that data
   const handleCreatePatient = (params, successCallback) => {
-    console.log("handleCreatePatient", params);
-    axios.post("http://localhost:3000/photos.json", params).then((response) => {
-    setPhotos([...patients, response.data]);
+    console.log("handleCreatePatient", params); //params is sendding the new patient's info to the server
+    axios.post("http://localhost:3000/patients.json", params).then((response) => {
+    setPatients([...patients, response.data]);
+    successCallback();//after updating state, this fx is called and allows you to continue to run code after patient successfully created
     });
   };
+//params data sending to the server when creating a new patient
+//successCallBack fx called when patient is successfully created
+//SetPatients is called and takes the existing patients array and adds the new patient (r.d.) to it
 
   useEffect(handleIndexPatients, []);
 
