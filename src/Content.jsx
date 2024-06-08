@@ -2,6 +2,7 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import { PatientsIndex } from "./PatientsIndex";
 import { PatientsNew } from "./PatientsNew";
+import { PatientsShow } from "./PatientsShow";
 import { Modal } from "./Modal";
 
 export function Content() {
@@ -9,7 +10,7 @@ export function Content() {
   const [isPatientsShowVisible, setIsPatientsShowVisible] = useState(false);
            //state variable, fx used to update variable, initializes default value of false
   const [currentPatient, setCurrentPatient] = useState ({});
-      //declaring variable, fx to updat    inititialzinz with empty object
+      //declaring variable, fx to update    inititialzing with empty object
      
 
   const handleIndexPatients = () => {
@@ -24,7 +25,7 @@ export function Content() {
 //response result of HTTP request
 //const HandleIndexPatients is a fx that fetches data from an API and updates the state with that data
   const handleCreatePatient = (params, successCallback) => {
-    console.log("handleCreatePatient", params); //params is sendding the new patient's info to the server
+    console.log("handleCreatePatient", params); //params is sending the new patient's info to the server
     axios.post("http://localhost:3000/patients.json", params).then((response) => {
     setPatients([...patients, response.data]);
     successCallback();//after updating state, this fx is called and allows you to continue to run code after patient successfully created
@@ -33,13 +34,35 @@ export function Content() {
 //params data sending to the server when creating a new patient
 //successCallBack fx called when patient is successfully created
 //SetPatients is called and takes the existing patients array and adds the new patient (r.d.) to it
-                         //paramerter, photo to be shown
+                         //paramerter, patient to be shown
   const handleShowPatient = (patient) => {
     console.log("handleShowPatient", patient);
     setIsPatientsShowVisible(true); //calls state setting fx to set state variable to true displaying patient
     setCurrentPatient(patient); //the other state setter that updates CurrentPatient with the patient parameter passed to the fx thus updating the current patient to be displayed
   };
-                     //arrow fx syntax used to define fx
+
+              //id of patient to be updated, params: obj containing the new data for the patient, fx to be called when the update is successful
+    const handleUpdatePatient = (id, params, successCallback) => {
+      console.log("handleUpdatePatient", params); //logs params to see what data is being sent to the server
+      axios.patch(`http://localhost:3000/patients/${id}.json`, params).then((response) => {
+        setPatients(  //updates the patients state with the new data
+        patients.map((patient) => { //iterates over current list of patients
+          if (patient.id === response.data.id) { //checks if patient's id matches id of the updated patient returned by the server
+            return response.data; //if true returns response.data
+          } else {
+            return patient; //if false returns the existing patient data unchanged
+          }
+        })
+      );
+      successCallback(); //calls this fx to perform any additional actions needed after the patient is successfully updated
+      handleClose(); //calls this function to close the modal or hide the patient details after the update it complete
+    });
+  };
+  //axios.patch sends HTTP PATCH request to the server to update to update the patient's data
+  //URL is the endpoint where the patient's data will be updated (for a given patient's id) and params is the data to be updated on the server
+  //response: response from the server after the PATCH request is completed
+
+
   const handleClose = () => {
     console.log("handleClose");
     setIsPatientsShowVisible(false); //calls function and closes patient display
@@ -53,10 +76,10 @@ export function Content() {
       <PatientsNew onCreatePatient={handleCreatePatient} />
       <PatientsIndex patients={patients} onShowPatient={handleShowPatient} />
       <Modal show={isPatientsShowVisible} onClose={handleClose}> 
-        <h1>Test</h1> 
+        <PatientsShow patient={currentPatient} onUpdatePatient={handleUpdatePatient} />
       </Modal>
     </main>
   )
 }
-// Modal component given to a prop called show with the value of ture
+// Modal component given to a prop called show with the value of true
 // <h1>Test</h1> this is the children prop
