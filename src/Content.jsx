@@ -67,16 +67,30 @@ export function Content() {
     console.log("handleClose");
     setIsPatientsShowVisible(false); //calls function and closes patient display
   };
+   //fx called handleDestroyPatient using arrow fx syntax (single parameter id, which is the identifier of the patient)
+  const handleDestroyPatient = (id) => {
+    console.log("handleDestroyPatient", id);//logs string and value of id
+    axios.delete(`http://localhost:3000/patients/${id}.json`).then((response) => {
+      setPatients(patients.filter((patient) => patient.id !== id)); 
+      handleClose(); //closes modal
+    });
+  };
+// axios.delete is used to send an HTTP DELETE request to the server
+// URL is constructed dynamically using the id parameter
+// The .then((response) => { ... }) part is a promise. When the server responds to the DELETE request, the .then method is executed with the response object
+// next line updates the state of the patients list
+// patients.filter((patient) => patient.id !== id) creates a new array that includes all patients except the one with the matching id. The filter method loops through each patient and includes only those patients whose id is not equal to the given id.
+// setPatients is a state updater fx (likely from useState hook) that updates the state with this new filtered array of patients.
+
 
   useEffect(handleIndexPatients, []);
-
 
   return (
     <main>
       <PatientsNew onCreatePatient={handleCreatePatient} />
       <PatientsIndex patients={patients} onShowPatient={handleShowPatient} />
       <Modal show={isPatientsShowVisible} onClose={handleClose}> 
-        <PatientsShow patient={currentPatient} onUpdatePatient={handleUpdatePatient} />
+        <PatientsShow patient={currentPatient} onUpdatePatient={handleUpdatePatient} onDestroyPatient={handleDestroyPatient}/>
       </Modal>
     </main>
   )

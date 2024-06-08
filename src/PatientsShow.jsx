@@ -8,6 +8,10 @@ export function PatientsShow(props) {
   // new FormData(event.target) creates a new FormData object from the form that triggered the event (accessible via event.target). The FormData object contains all the data from the form fields, which can be easily accessed and manipulated.
   // () => event.target.reset()); callback fx that resets the form after patient has been update, clearing all the fields in the form
 
+  const handleClick = () => {
+    props.onDestroyPatient(props.patient.id);
+  };
+
   return (
     <div>
       <h1>Patient information</h1>
@@ -26,6 +30,7 @@ export function PatientsShow(props) {
         </div>
         <button type="submit">Update patient</button>
       </form>
+      <button onClick={handleClick}>Destroy patient</button>
     </div>
   );
 }
